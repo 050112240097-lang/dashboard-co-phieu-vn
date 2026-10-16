@@ -10,6 +10,7 @@ numpy==2.2.6
 openpyxl==3.1.5
 python-dateutil==2.9.0.post0
 
+--extra-index-url https://vnstocks.com/api/packages
 vnstock==5.0.3
 yfinance>=0.2.40
 
