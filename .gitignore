@@ -1,0 +1,122 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual env
+venv/
+ENV/
+env/
+.venv
+
+# Cache & data (khong can upload len HF)
+*_cache.json
+*_cache/
+stock_data.xlsx
+stock_data_backup.xlsx
+watchlist.db
+reports_cache.json
+industries_cache.json
+dashboard_caches.json
+
+# PDF
+*.pdf
+
+# Chart test
+test_*.png
+chart_*.png
+
+# Log
+*.log
+
+# Backups
+*.bak_*
+*.tabs_bak_*
+*.final_bak_*
+*.btn_bak_*
+*.classify_bak_*
+*.pdffilter_bak_*
+*.scoring_bak_*
+*.risk_bak_*
+*.compare_bak_*
+*.cmpui_bak_*
+*.pfui_bak_*
+*.goiA_bak_*
+*.chart_bak_*
+*.watchlist_bak_*
+*.wlui_bak_*
+*.ctck_bak_*
+*.ctckui_bak_*
+*.ctckdeep_bak_*
+*.suffix_bak_*
+*.fb_bak_*
+*.hf_bak_*
+*.lock_bak_*
+*.autostart_bak_*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config (chua API key - KHONG upload)
+config.py
+.env
+
+# Khong upload file nay len git
+*.bak
+*.bak_*
+*.bak2_*
+*.js_bak_*
+*.screener_bak_*
+*.portfolio_bak_*
+*.tabs_bak_*
+*.final_bak_*
+*.goiA_bak_*
+*.chart_bak_*
+*.risk_bak_*
+*.scoring_bak_*
+*.compare_bak_*
+*.cmpui_bak_*
+*.pfui_bak_*
+*.watchlist_bak_*
+*.wlui_bak_*
+*.ctck_bak_*
+*.ctckui_bak_*
+*.ctckdeep_bak_*
+*.btn_bak_*
+*.classify_bak_*
+*.pdffilter_bak_*
+*.lock_bak_*
+*.autostart_bak_*
+*.suffix_bak_*
+*.fb_bak_*
+*.hf_bak_*
+_dump.txt
+notepad
+patch_*.py
+test_*.py
+upgrade_markdown.py
