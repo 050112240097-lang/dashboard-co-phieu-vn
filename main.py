@@ -1,4 +1,5 @@
 # main.py - Dashboard 10 tabs - Full features (FIXED)
+import config_bootstrap
 import os
 import time
 import json
