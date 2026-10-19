@@ -1,6 +1,7 @@
 # server.py - Flask server + real-time prices + full update with progress
 from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
+import config_bootstrap
 import pandas as pd
 import json
 import os
