@@ -74,43 +74,49 @@ def get_current_session():
 
 def fetch_batch(symbols_batch):
     try:
-        # Ưu tiên sử dụng lotusmarket để lấy dữ liệu realtime
-        from lotusmarket.fetchers import vps_multiple
+        import quant_agent as qa
         import pandas as pd
+
+        # quant_agent.price_board trả về DataFrame với dữ liệu realtime
+        df = qa.price_board(symbols_batch)
         
-        # Lấy dữ liệu realtime cho cả batch
-        stocks = vps_multiple(symbols_batch)
+        if df is None or df.empty:
+            return None
+
+        # Chuẩn hóa tên cột để khớp với cấu trúc code hiện tại
+        # (Tên cột thực tế có thể thay đổi, cần kiểm tra lại sau khi chạy)
+        column_map = {
+            'symbol': 'symbol',
+            'exchange': 'exchange',
+            'ceiling_price': 'ceiling',
+            'floor_price': 'floor',
+            'reference_price': 'reference',
+            'close_price': 'close',
+            'open_price': 'open',
+            'high_price': 'high',
+            'low_price': 'low',
+            'volume_accumulated': 'volume',
+            'price_change': 'change',
+            'percent_change': 'pct',
+            'foreign_buy_volume': 'foreign_buy',
+            'foreign_sell_volume': 'foreign_sell',
+            'foreign_net_volume': 'foreign_net',
+            'time': 'time'
+        }
         
-        all_data = []
-        for stock in stocks:
-            # Chuyển đổi dữ liệu từ object của lotusmarket sang dict
-            # để tương thích với cấu trúc DataFrame hiện tại
-            all_data.append({
-                'symbol': stock.ticker,
-                'exchange': 'HOSE',  # lotusmarket chưa hỗ trợ lấy sàn, mặc định HOSE
-                'ceiling': stock.ceiling if hasattr(stock, 'ceiling') else stock.close * 1.07,
-                'floor': stock.floor if hasattr(stock, 'floor') else stock.close * 0.93,
-                'reference': stock.reference if hasattr(stock, 'reference') else stock.close,
-                'close': stock.close,
-                'open': stock.open,
-                'high': stock.high,
-                'low': stock.low,
-                'volume': stock.volume,
-                'change': stock.change if hasattr(stock, 'change') else 0,
-                'pct': stock.change_percent if hasattr(stock, 'change_percent') else 0,
-                'foreign_buy': stock.foreign_buy_vol if hasattr(stock, 'foreign_buy_vol') else 0,
-                'foreign_sell': stock.foreign_sell_vol if hasattr(stock, 'foreign_sell_vol') else 0,
-                'foreign_net': stock.foreign_net_vol if hasattr(stock, 'foreign_net_vol') else 0,
-                'time': pd.Timestamp.now().strftime('%d/%m/%Y %H:%M:%S')
-            })
+        # Đổi tên cột nếu cần
+        df = df.rename(columns={k: v for k, v in column_map.items() if k in df.columns})
+
+        # Đảm bảo có đủ các cột cần thiết, nếu thiếu thì điền giá trị mặc định
+        for col in ['ceiling', 'floor', 'reference', 'open', 'high', 'low', 'change', 'pct', 'foreign_buy', 'foreign_sell', 'foreign_net']:
+            if col not in df.columns:
+                df[col] = 0
         
-        if all_data:
-            return pd.DataFrame(all_data)
-        return None
+        return df
         
     except Exception as e:
-        print(f"    [LOI lotusmarket] {str(e)[:100]}")
-        # Fallback: Thử dùng vnstock nếu lotusmarket lỗi (chỉ chạy được ở local)
+        print(f"    [LOI quant_agent] {str(e)[:100]}")
+        # Fallback: Thử dùng vnstock nếu quant_agent lỗi (chỉ chạy được ở local)
         try:
             from vnstock import Trading
             trading = Trading(source=DATA_SOURCE)
@@ -118,6 +124,7 @@ def fetch_batch(symbols_batch):
         except Exception as e2:
             print(f"    [LOI vnstock fallback] {str(e2)[:100]}")
             return None
+
 
 def _is_data_valid_for_today(df):
     if df.empty:
