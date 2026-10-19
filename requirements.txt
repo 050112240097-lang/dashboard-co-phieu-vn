@@ -33,3 +33,5 @@ schedule==1.2.2
 tqdm==4.70.1
 
 gunicorn>=21.0.0
+
+lotusmarket[fetchers]

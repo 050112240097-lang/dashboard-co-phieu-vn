@@ -74,13 +74,50 @@ def get_current_session():
 
 def fetch_batch(symbols_batch):
     try:
-        from vnstock import Trading
-        trading = Trading(source=DATA_SOURCE)
-        return trading.price_board(symbols_batch)
-    except Exception as e:
-        print(f"    [LOI batch] {str(e)[:100]}")
+        # Ưu tiên sử dụng lotusmarket để lấy dữ liệu realtime
+        from lotusmarket.fetchers import vps_multiple
+        import pandas as pd
+        
+        # Lấy dữ liệu realtime cho cả batch
+        stocks = vps_multiple(symbols_batch)
+        
+        all_data = []
+        for stock in stocks:
+            # Chuyển đổi dữ liệu từ object của lotusmarket sang dict
+            # để tương thích với cấu trúc DataFrame hiện tại
+            all_data.append({
+                'symbol': stock.ticker,
+                'exchange': 'HOSE',  # lotusmarket chưa hỗ trợ lấy sàn, mặc định HOSE
+                'ceiling': stock.ceiling if hasattr(stock, 'ceiling') else stock.close * 1.07,
+                'floor': stock.floor if hasattr(stock, 'floor') else stock.close * 0.93,
+                'reference': stock.reference if hasattr(stock, 'reference') else stock.close,
+                'close': stock.close,
+                'open': stock.open,
+                'high': stock.high,
+                'low': stock.low,
+                'volume': stock.volume,
+                'change': stock.change if hasattr(stock, 'change') else 0,
+                'pct': stock.change_percent if hasattr(stock, 'change_percent') else 0,
+                'foreign_buy': stock.foreign_buy_vol if hasattr(stock, 'foreign_buy_vol') else 0,
+                'foreign_sell': stock.foreign_sell_vol if hasattr(stock, 'foreign_sell_vol') else 0,
+                'foreign_net': stock.foreign_net_vol if hasattr(stock, 'foreign_net_vol') else 0,
+                'time': pd.Timestamp.now().strftime('%d/%m/%Y %H:%M:%S')
+            })
+        
+        if all_data:
+            return pd.DataFrame(all_data)
         return None
-
+        
+    except Exception as e:
+        print(f"    [LOI lotusmarket] {str(e)[:100]}")
+        # Fallback: Thử dùng vnstock nếu lotusmarket lỗi (chỉ chạy được ở local)
+        try:
+            from vnstock import Trading
+            trading = Trading(source=DATA_SOURCE)
+            return trading.price_board(symbols_batch)
+        except Exception as e2:
+            print(f"    [LOI vnstock fallback] {str(e2)[:100]}")
+            return None
 
 def _is_data_valid_for_today(df):
     if df.empty:
