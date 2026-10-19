@@ -120,3 +120,4 @@ notepad
 patch_*.py
 test_*.py
 upgrade_markdown.py
+#index.html

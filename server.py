@@ -153,6 +153,8 @@ def load_data():
 # ============================================================
 @app.route('/')
 def index():
+    if not os.path.exists('index.html'):
+        return "<h2 style='text-align:center;font-family:sans-serif;margin-top:50px;'>⏳ Hệ thống đang khởi tạo dữ liệu lần đầu...</h2><p style='text-align:center;'>Vui lòng đợi 1-2 phút và tải lại trang (F5).</p><script>setTimeout(function(){ location.reload(); }, 15000);</script>"
     return send_from_directory('.', 'index.html')
 
 
