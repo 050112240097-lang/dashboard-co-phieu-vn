@@ -916,7 +916,7 @@ async function loadPdfList(){
   if (!el) return;
   el.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div><div>Đang tải...</div></div>';
   try {
-    var res = await fetch('http://localhost:5000/api/pdfs');
+    var res = await fetch('/api/pdfs');
     var data = await res.json();
     if (data.error){
       el.innerHTML = '<div class="empty"><div class="empty-icon">❌</div><div>' + data.error + '</div></div>';
@@ -1081,8 +1081,8 @@ function renderPdfCard(p, color){
     + '<div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">📁 ' + p.filename + ' · ' + p.size_kb + ' KB</div>'
     + '</div>'
     + '<div style="display:flex;gap:8px;">'
-    + '<a href="http://localhost:5000/pdfs/' + p.filename + '" target="_blank" rel="noopener noreferrer" class="report-link">👁️ Xem</a>'
-    + '<a href="http://localhost:5000/pdfs/' + p.filename + '" download class="report-link green">📥 Tải</a>'
+    + '<a href="/pdfs/' + p.filename + '" target="_blank" rel="noopener noreferrer" class="report-link">👁️ Xem</a>'
+    + '<a href="/pdfs/' + p.filename + '" download class="report-link green">📥 Tải</a>'
     + '</div></div></div>';
 }
 
@@ -1149,7 +1149,7 @@ function renderSentimentBadge(n){
 
 async function loadRiskFor(symbol){
   try {
-    var res = await fetch('http://localhost:5000/api/risk/' + symbol);
+    var res = await fetch('/api/risk/' + symbol);
     var data = await res.json();
     return data;
   } catch(err){ return null; }
@@ -1159,7 +1159,7 @@ async function loadModalChart(symbol){
   var el = document.getElementById('modalChart');
   if(!el) return;
   try {
-    var res = await fetch('http://localhost:5000/api/chart/' + symbol);
+    var res = await fetch('/api/chart/' + symbol);
     var data = await res.json();
     if(data.error){
       el.innerHTML = '<div style="padding:20px;color:var(--red);font-size:12px;">⚠️ Không tải được biểu đồ</div>';
@@ -1220,7 +1220,7 @@ async function renderSSIReports(){
   const el=document.getElementById('ssiReportList');
   el.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div><div>Đang tải báo cáo...</div></div>';
   try {
-    const res = await fetch('http://localhost:5000/api/reports?force=' + (window._forceReports ? '1' : '0'));
+    const res = await fetch('/api/reports?force=' + (window._forceReports ? '1' : '0'));
     window._forceReports = false;
     const data = await res.json();
     if(data.error || !data.reports || data.reports.length === 0){
@@ -1297,7 +1297,7 @@ async function askAI(){
   if(!symbol){alert('Vui lòng nhập mã cổ phiếu');return;}
   result.innerHTML = '<div style="text-align:center;padding:40px;"><div style="font-size:36px;margin-bottom:12px;">⏳</div><div style="color:var(--text-secondary);">AI đang phân tích '+symbol+'...</div></div>';
   try {
-    const res = await fetch('http://localhost:5000/api/analyze', {
+    const res = await fetch('/api/analyze', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({symbol, question})
@@ -1350,7 +1350,7 @@ async function runDeepAnalysis(){
     '<span style="font-size:12px;color:var(--text-muted);">(lần đầu 3-4 phút nếu ngành chưa có cache, các lần sau tức thì)</span></div></div>';
 
   try {
-    const res = await fetch('http://localhost:5000/api/deep-analyze', {
+    const res = await fetch('/api/deep-analyze', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({symbol, question})
@@ -1637,7 +1637,7 @@ async function fetchRealtimePrices(silent){
   const btn = document.getElementById('refreshBtn');
   if(!silent && btn){btn.textContent = '⏳';btn.style.opacity = '0.6';}
   try {
-    const res = await fetch('http://localhost:5000/api/prices');
+    const res = await fetch('/api/prices');
     const data = await res.json();
     if(data.error){console.error('Loi fetch gia:', data.error);return;}
     const stocks = data.stocks || [];
@@ -1677,7 +1677,7 @@ async function fullRefresh(){
   document.getElementById('progressStep').textContent = 'Đang khởi động...';
   document.getElementById('progressIcon').textContent = '⚡';
   try {
-    await fetch('http://localhost:5000/api/refresh', {method: 'POST'});
+    await fetch('/api/refresh', {method: 'POST'});
     pollFullRefresh();
   } catch(err){
     alert('Không kết nối được server');
@@ -1696,7 +1696,7 @@ function pollFullRefresh(){
   if(_pollInterval) clearInterval(_pollInterval);
   _pollInterval = setInterval(async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/status');
+      const res = await fetch('/api/status');
       const data = await res.json();
       const percent = data.percent || 0;
       const step = data.step || 'Đang xử lý...';
@@ -1871,7 +1871,7 @@ var _watchlistCache = [];
 
 async function loadWatchlist(){
   try {
-    var res = await fetch('http://localhost:5000/api/watchlist');
+    var res = await fetch('/api/watchlist');
     var data = await res.json();
     _watchlistCache = data.items || [];
     _updateStarButtons();
@@ -1904,14 +1904,14 @@ async function toggleWatchlist(sym, ev){
   sym = sym.toUpperCase();
   try {
     if(isWatched(sym)){
-      var res = await fetch('http://localhost:5000/api/watchlist/' + sym, { method: 'DELETE' });
+      var res = await fetch('/api/watchlist/' + sym, { method: 'DELETE' });
       var data = await res.json();
       if(data.ok){
         _watchlistCache = _watchlistCache.filter(function(w){ return w.symbol !== sym; });
         showToast('🗑️ Đã bỏ ' + sym);
       }
     } else {
-      var res2 = await fetch('http://localhost:5000/api/watchlist', {
+      var res2 = await fetch('/api/watchlist', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({symbol: sym})
@@ -1935,7 +1935,7 @@ async function addToWatchlist(){
   if(!sym){ alert('Nhập mã cổ phiếu'); return; }
   if(isWatched(sym)){ alert(sym + ' đã có trong danh mục'); return; }
   try {
-    var res = await fetch('http://localhost:5000/api/watchlist', {
+    var res = await fetch('/api/watchlist', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({symbol: sym})
@@ -1959,7 +1959,7 @@ async function removeFromWatchlist(sym, ev){
   if(ev){ ev.stopPropagation(); }
   if(!confirm('Bỏ ' + sym + ' khỏi danh mục?')) return;
   try {
-    var res = await fetch('http://localhost:5000/api/watchlist/' + sym, { method: 'DELETE' });
+    var res = await fetch('/api/watchlist/' + sym, { method: 'DELETE' });
     var data = await res.json();
     if(data.ok){
       _watchlistCache = _watchlistCache.filter(function(w){ return w.symbol !== sym; });
@@ -2021,7 +2021,7 @@ function renderWatchlist(){
 // ============================================================
 async function loadCtckFor(symbol){
   try {
-    var res = await fetch('http://localhost:5000/api/ctck/' + symbol);
+    var res = await fetch('/api/ctck/' + symbol);
     var data = await res.json();
     return data;
   } catch(err){
@@ -2132,7 +2132,7 @@ async function runCompare(){
     '</div>';
 
   try {
-    var res = await fetch('http://localhost:5000/api/compare/' + s1 + '/' + s2);
+    var res = await fetch('/api/compare/' + s1 + '/' + s2);
     var data = await res.json();
     if(data.error){
       result.innerHTML = '<div class="empty"><div class="empty-icon">❌</div><div>' + data.error + '</div></div>';
@@ -2337,7 +2337,7 @@ async function runPortfolioOptimize(){
     + '</div>';
 
   try {
-    var res = await fetch('http://localhost:5000/api/portfolio/optimize', {
+    var res = await fetch('/api/portfolio/optimize', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
